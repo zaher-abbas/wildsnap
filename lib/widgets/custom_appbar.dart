@@ -30,9 +30,8 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
                 Text(
                   'WildSnap',
                   style: TextStyle(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w900,
                     fontFamily: 'Roboto',
-                    color: Colors.white,
                     fontSize: 20,
                   ),
                 ),
