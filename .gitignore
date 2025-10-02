@@ -64,6 +64,10 @@ macos/*.xcworkspace
 macos/*.xcuserdata
 macos/Flutter/GeneratedPluginRegistrant.swift
 
+# Firebase (ne pas versionner les fichiers sensibles)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
 # Others
 *.log
 *.tmp
