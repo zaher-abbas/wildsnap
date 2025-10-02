@@ -1,1 +1,24 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"wildsnap-fb432","appId":"1:951213639857:android:523e15646bcea7c9727a90","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"wildsnap-fb432","configurations":{"android":"1:951213639857:android:523e15646bcea7c9727a90","ios":"1:951213639857:ios:7edc39fcff642fe6727a90","web":"1:951213639857:web:07165411e82e5f0f727a90","windows":"1:951213639857:web:0e4b04902dd250f8727a90"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "wildsnap-fb432",
+          "appId": "1:951213639857:android:523e15646bcea7c9727a90",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "wildsnap-fb432",
+          "configurations": {
+            "android": "1:951213639857:android:523e15646bcea7c9727a90",
+            "ios": "1:951213639857:ios:7edc39fcff642fe6727a90",
+            "web": "1:951213639857:web:07165411e82e5f0f727a90",
+            "windows": "1:951213639857:web:0e4b04902dd250f8727a90"
+          }
+        }
+      }
+    }
+  }
+}
