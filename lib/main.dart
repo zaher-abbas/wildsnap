@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-
 import 'package:flutter/material.dart';
 import 'package:wildsnap/screens/home_page.dart';
 
@@ -13,15 +12,15 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'WildSnap',
       theme: ThemeData(
-        scaffoldBackgroundColor: (Colors.green),
+        scaffoldBackgroundColor: (Colors.white),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const HomePage(),
