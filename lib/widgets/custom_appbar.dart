@@ -31,7 +31,6 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
                   'WildSnap',
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'Roboto',
                     fontSize: 20,
                   ),
                 ),
@@ -43,7 +42,6 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontWeight: FontWeight.w600,
-              fontFamily: 'Roboto',
               color: Colors.white70,
               fontSize: 18,
             ),
@@ -51,8 +49,9 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
           Align(
             alignment: Alignment.centerRight,
             child: Switch(
-              value: true,
-              inactiveTrackColor: Colors.yellow[400],
+              value: false,
+              inactiveTrackColor: Colors.yellow[500],
+              activeTrackColor: Colors.black,
               onChanged: (value) {},
             ),
           ),
