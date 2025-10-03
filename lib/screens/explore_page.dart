@@ -8,7 +8,7 @@ class ExplorePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(title: 'Explore'),
-      body: const Center(child: Text('Explore content here')),
+      body: const Center(child: Text('Explore here')),
     );
   }
 }

@@ -8,7 +8,7 @@ class CollectionsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(title: 'Collections'),
-      body: const Center(child: Text('Collections content here')),
+      body: const Center(child: Text('Collections here')),
     );
   }
 }
