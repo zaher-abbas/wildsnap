@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:wildsnap/models/cat_facts.dart';
 
-Future<CatFact> fetchMeowFacts({int count = 1}) async {
+Future<CatFact> fetchCatFacts({int count = 1}) async {
   final uri = Uri.parse('https://meowfacts.herokuapp.com/');
   final response = await http.get(uri);
 
