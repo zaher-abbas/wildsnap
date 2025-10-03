@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wildsnap/widgets/custom_appbar.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
