@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'home_page.dart'; // ton fichier existant
+import 'home_page.dart';
 import 'explore_page.dart';
 import 'collections_page.dart';
 
@@ -27,26 +27,27 @@ class _MainScreenState extends State<MainScreen> {
         index: _selectedIndex,
         children: _pages,
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        child: GNav(
-          gap: 8,
-          activeColor: Colors.white,
-          color: Colors.grey[600],
-          backgroundColor: Colors.white,
-          tabBackgroundColor: Colors.deepPurple,
-          padding: const EdgeInsets.all(16),
-          selectedIndex: _selectedIndex,
-          onTabChange: (index) {
-            setState(() => _selectedIndex = index);
-          },
-          tabs: const [
-            GButton(icon: Icons.home, text: 'Home'),
-            GButton(icon: Icons.explore, text: 'Explore'),
-            GButton(icon: Icons.collections, text: 'Collections'),
-          ],
-        ),
-      ),
-    );
+        bottomNavigationBar: Container(
+          color: Colors.green[700],
+            child: GNav(
+              gap: 4,
+              activeColor: Colors.white,
+              color: Colors.black,
+              backgroundColor: Colors.transparent,
+              tabBackgroundColor: Colors.green,
+              padding: const EdgeInsets.all(16),
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              selectedIndex: _selectedIndex,
+              onTabChange: (index) {
+                setState(() => _selectedIndex = index);
+              },
+              tabs: const [
+                GButton(icon: Icons.home, text: 'Home'),
+                GButton(icon: Icons.explore, text: 'Explore'),
+                GButton(icon: Icons.collections, text: 'Collections'),
+              ],
+            ),
+          ),
+        );
   }
 }
