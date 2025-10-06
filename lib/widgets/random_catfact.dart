@@ -39,7 +39,7 @@ class _RandomCatfactState extends State<RandomCatfact> {
   @override
   void initState() {
     super.initState();
-    _loadRandomFact(); // charge l'api au démarrage
+    _loadRandomFact();
   }
 
   @override
@@ -62,8 +62,8 @@ class _RandomCatfactState extends State<RandomCatfact> {
               elevation: 4,
               color: Colors.amber[200],
               child: Container(
-                width: 600, // largeur fixe pour empêcher les sauts
-                height: 170, // hauteur fixe ou maximum
+                width: 600,
+                height: 170,
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   children: [
