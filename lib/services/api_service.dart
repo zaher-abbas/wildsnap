@@ -7,8 +7,8 @@ Future<CatFact> fetchCatFacts({int count = 1}) async {
   final response = await http.get(uri);
 
   if (response.statusCode == 200) {
-    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-    return CatFact.fromJson(decoded);
+    final datas = jsonDecode(response.body) as Map<String, dynamic>;
+    return CatFact.fromJson(datas);
   } else {
     throw Exception('Failed to load the api meow facts');
   }
