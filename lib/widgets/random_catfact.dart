@@ -1,7 +1,7 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:wildsnap/services/api_service.dart';
+import 'package:wildsnap/services/fetchcatfact_service.dart';
 
 class RandomCatfact extends StatefulWidget {
   const RandomCatfact({super.key});
