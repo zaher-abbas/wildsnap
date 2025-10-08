@@ -41,7 +41,7 @@ class _AddPostPageState extends State<AddPostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(title: 'Nouvelle Publication'),
+      appBar: CustomAppbar(title: 'Nouveau Animal'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -109,7 +109,7 @@ class _AddPostPageState extends State<AddPostPage> {
                 labelText: 'Description (optionnel)',
                 border: OutlineInputBorder(),
               ),
-              maxLines: 3, // Pour un champ de texte plus grand
+              maxLines: 3,
             ),
             const SizedBox(height: 32),
 
