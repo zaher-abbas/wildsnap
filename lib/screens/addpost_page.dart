@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:wildsnap/widgets/camera_page.dart';
 import 'package:wildsnap/widgets/custom_appbar.dart';
 
-class ExplorePage extends StatelessWidget {
-  const ExplorePage({super.key});
+class AddPostPage extends StatelessWidget {
+  const AddPostPage({super.key});
 
   @override
   Widget build(BuildContext context) {
