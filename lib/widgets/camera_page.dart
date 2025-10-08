@@ -43,19 +43,14 @@ class _CameraPageState extends State<CameraPage> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          height: 150,
-          width: 150,
-          child: _buildImageWidget(),
-        ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                shape: const CircleBorder(),
                 padding: const EdgeInsets.all(24),
                 backgroundColor: Colors.green[800],
+                overlayColor: Colors.greenAccent,
               ),
               onPressed: () => pickImage(ImageSource.camera),
               child: const Icon(
@@ -64,11 +59,14 @@ class _CameraPageState extends State<CameraPage> {
                 size: 34,
               ),
             ),
+            SizedBox(
+              width: 25,
+            ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                shape: const CircleBorder(),
                 padding: const EdgeInsets.all(24),
                 backgroundColor: Colors.green[800],
+                overlayColor: Colors.greenAccent,
               ),
               onPressed: () => pickImage(ImageSource.gallery),
               child: const Icon(
@@ -77,8 +75,13 @@ class _CameraPageState extends State<CameraPage> {
                 size: 34,
               ),
             ),
-          ],
+          ]
         ),
+        SizedBox(
+          height: MediaQuery.of(context).size.width /1.2,
+          width: MediaQuery.of(context).size.width /1.2,
+          child: _buildImageWidget(),
+    ),
       ],
     );
   }

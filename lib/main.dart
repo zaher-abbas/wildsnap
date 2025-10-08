@@ -1,5 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:wildsnap/screens/login_screen.dart';
 import 'package:wildsnap/screens/main_screen.dart';
+import 'package:wildsnap/screens/register_page.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 void main() async {
@@ -17,10 +19,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+      },
       title: 'WildSnap',
       theme: ThemeData(
         scaffoldBackgroundColor: (Colors.white),
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
       home: const MainScreen(),
     );
