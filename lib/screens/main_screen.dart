@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'home_page.dart';
-import 'explore_page.dart';
+import 'addpost_page.dart';
 import 'collections_page.dart';
 
 class MainScreen extends StatefulWidget {
@@ -16,7 +16,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = const [
     HomePage(),
-    ExplorePage(),
+    AddPostPage(),
     CollectionsPage(),
   ];
 
@@ -43,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
               },
               tabs: const [
                 GButton(icon: Icons.home, text: 'Home'),
-                GButton(icon: Icons.explore, text: 'Explore'),
+                GButton(icon: Icons.post_add, text: 'Add Post'),
                 GButton(icon: Icons.collections, text: 'Collections'),
               ],
             ),
