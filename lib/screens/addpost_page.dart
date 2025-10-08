@@ -89,17 +89,11 @@ class _AddPostPageState extends State<AddPostPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              height: 250,
-              width: double.infinity,
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                border: Border.all(color: Colors.grey.shade400),
-                borderRadius: BorderRadius.circular(12),
+            SizedBox(
+                height: MediaQuery.of(context).size.width /2,
+                width: MediaQuery.of(context).size.width /2,
+                child: _buildImagePreview(),
               ),
-              child: _buildImagePreview(),
-            ),
             const SizedBox(height: 24),
 
             // --- Boutons pour caméra et galerie ---
