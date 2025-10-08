@@ -7,7 +7,6 @@ import 'package:wildsnap/theme.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 
-import 'theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Initialise les Widgets
   await Firebase.initializeApp( // Initialise la connexion avec Firebase
