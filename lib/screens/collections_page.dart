@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wildsnap/services/auth_service.dart';
 import 'package:wildsnap/widgets/custom_appbar.dart';
 
 class CollectionsPage extends StatelessWidget {
@@ -8,7 +9,14 @@ class CollectionsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(title: 'Collections'),
-      body: const Center(child: Text('Collections here')),
+      body: Center(
+                child: IconButton(
+                  icon: const Icon(Icons.logout),
+                  onPressed: () async {
+                    await AuthService().signOut();
+                  },
+                )
+            )
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wildsnap/screens/login_screen.dart';
+import 'package:wildsnap/services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -13,6 +14,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _authService = AuthService();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -22,11 +25,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _registerUser() {
+  Future<void> _registerUser() async {
     if (_formKey.currentState!.validate()) {
-      print('Nom: ${_nameController.text}');
-      print('Email: ${_emailController.text}');
-      print('Password: ${_passwordController.text}');
+      setState(() {
+        _isLoading = true;
+      });try {
+        await _authService.registerWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          name: _nameController.text.trim(),
+        );
+
+        if (mounted) {
+          // Inscription réussie, naviguer vers l'écran principal
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Inscription réussie !'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          // Remplacez HomeScreen par votre écran d'accueil
+          // Navigator.of(context).pushReplacement(
+          //   MaterialPageRoute(builder: (context) => const HomeScreen()),
+          // );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.toString()),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
     }
   }
 
@@ -68,6 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     labelText: 'Nom',
                     border: OutlineInputBorder(),
                   ),
+                  enabled: !_isLoading,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Veuillez entrer votre nom.';
@@ -83,6 +122,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.emailAddress,
+                  enabled: !_isLoading,
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty ||
@@ -100,6 +140,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     border: OutlineInputBorder(),
                   ),
                   obscureText: true,
+                  enabled: !_isLoading,
                   validator: (value) {
                     if (value == null || value.length < 6) {
                       return 'Le mot de passe doit contenir au moins 6 caractères.';
@@ -109,14 +150,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: _registerUser,
+                  onPressed: _isLoading ? null : _registerUser,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: const Text('S\'inscrire'),
+                  child: _isLoading
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                      : const Text('S\'inscrire'),
                 ),
                 TextButton(
-                  onPressed: _navigateToLogin,
+                  onPressed: _isLoading ? null : _navigateToLogin,
                   child: const Text('Déjà un compte ? Se connecter'),
                 ),
               ],
