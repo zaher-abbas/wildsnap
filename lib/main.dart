@@ -1,15 +1,24 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'package:wildsnap/screens/login_screen.dart';
 import 'package:wildsnap/screens/main_screen.dart';
 import 'package:wildsnap/screens/register_page.dart';
+import 'package:wildsnap/theme.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Initialise les Widgets
   await Firebase.initializeApp( // Initialise la connexion avec Firebase
   options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(
+    // Ecoute les widget et le changement de thème
+      ChangeNotifierProvider(
+        create: (_) => ThemeProvider(),  // Crée une instance du Theme
+        child: const MyApp(),            // Tout ce qui est en dessous peut y accéder
+      ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,6 +26,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: '/login',
@@ -26,10 +37,9 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterScreen(),
       },
       title: 'WildSnap',
-      theme: ThemeData(
-        scaffoldBackgroundColor: (Colors.white),
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-      ),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: themeProvider.isDark ? ThemeMode.dark : ThemeMode.light,
       home: const MainScreen(),
     );
   }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:wildsnap/theme.dart';
 
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -10,9 +12,9 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<ThemeProvider>();
     return AppBar(
       automaticallyImplyLeading: false,
-      backgroundColor: Colors.green[800],
       title: Stack(
         alignment: Alignment.center,
         children: [
@@ -38,21 +40,14 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Colors.white70,
-              fontSize: 18,
-            ),
+              title,
+              style: TextStyle(color: Colors.white70)
           ),
           Align(
             alignment: Alignment.centerRight,
             child: Switch(
-              value: false,
-              inactiveTrackColor: Colors.yellow[500],
-              activeTrackColor: Colors.black,
-              onChanged: (value) {},
+              value: provider.isDark,           // État actuel du thème
+              onChanged: (_) => provider.toggle(),  // Bascule le thème au clic
             ),
           ),
         ],

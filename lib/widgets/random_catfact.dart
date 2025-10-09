@@ -1,5 +1,4 @@
 import 'dart:core';
-
 import 'package:flutter/material.dart';
 import 'package:wildsnap/services/fetchcatfact_service.dart';
 
@@ -60,7 +59,9 @@ class _RandomCatfactState extends State<RandomCatfact> {
                 borderRadius: BorderRadius.circular(5),
               ),
               elevation: 4,
-              color: Colors.amber[200],
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black26
+                  : Colors.amber[200],
               child: Container(
                 width: 600,
                 height: 170,
@@ -71,10 +72,12 @@ class _RandomCatfactState extends State<RandomCatfact> {
                       child: SingleChildScrollView(
                         child: Text(
                           _fact!,
-                          style: TextStyle(
+                          style: DefaultTextStyle.of(context).style.copyWith(
                             fontSize: 20,
                             fontStyle: FontStyle.italic,
-                            color: Colors.black87,
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black87,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -85,10 +88,6 @@ class _RandomCatfactState extends State<RandomCatfact> {
                       onPressed: _loadRandomFact,
                       icon: Icon(Icons.refresh),
                       label: Text('Another fact'),
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all<Color>(Colors.green[800]!),
-                        foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-                      ),
                     ),
                   ],
                 ),

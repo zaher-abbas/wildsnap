@@ -49,13 +49,10 @@ class _CameraPageState extends State<CameraPage> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(24),
-                backgroundColor: Colors.green[800],
-                overlayColor: Colors.greenAccent,
               ),
               onPressed: () => pickImage(ImageSource.camera),
               child: const Icon(
                 Icons.photo_camera,
-                color: Colors.white,
                 size: 34,
               ),
             ),
@@ -65,23 +62,26 @@ class _CameraPageState extends State<CameraPage> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(24),
-                backgroundColor: Colors.green[800],
-                overlayColor: Colors.greenAccent,
               ),
               onPressed: () => pickImage(ImageSource.gallery),
               child: const Icon(
                 Icons.photo_library,
-                color: Colors.white,
                 size: 34,
               ),
             ),
           ]
         ),
         SizedBox(
+          height: 15,
+        ),
+        SizedBox(
           height: MediaQuery.of(context).size.width /1.2,
           width: MediaQuery.of(context).size.width /1.2,
           child: _buildImageWidget(),
-    ),
+        ),
+        SizedBox(
+          height: 15,
+        ),
       ],
     );
   }
