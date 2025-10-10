@@ -8,7 +8,7 @@ class CollectionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(title: 'Collections'),
+      appBar: CustomAppbar(),
       body: Center(
                 child: IconButton(
                   icon: const Icon(Icons.logout),

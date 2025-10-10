@@ -73,7 +73,7 @@ class _RandomCatfactState extends State<RandomCatfact> {
                         child: Text(
                           _fact!,
                           style: DefaultTextStyle.of(context).style.copyWith(
-                            fontSize: 20,
+                            fontSize: 16,
                             fontStyle: FontStyle.italic,
                             color: Theme.of(context).brightness == Brightness.dark
                                 ? Colors.white
