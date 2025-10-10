@@ -15,20 +15,25 @@ class _RandomCatfactState extends State<RandomCatfact> {
   String? _error;
 
   Future<void> _loadRandomFact() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
       _error = null;
     });
     try {
       final catFact = await fetchCatFacts();
+
+      if (!mounted) return;
       setState(() {
         _fact = catFact.fact;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _error = e.toString();
       });
     } finally {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });

@@ -1,9 +1,7 @@
-import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:wildsnap/screens/home_page.dart';
+import 'package:http/http.dart' as http;
+import 'package:wildsnap/screens/main_screen.dart';
 import 'package:wildsnap/services/post_service.dart';
 import 'package:wildsnap/widgets/custom_appbar.dart';
 
@@ -15,13 +13,13 @@ class AddPostPage extends StatefulWidget {
 }
 
 class _AddPostPageState extends State<AddPostPage> {
-  XFile? _image;
+  String? _imageUrl;
   bool _isLoading = false;
 
   final _animalNameController = TextEditingController();
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _picker = ImagePicker();
+  final _imageUrlController = TextEditingController();
   final _postService = PostService();
 
   @override
@@ -29,21 +27,24 @@ class _AddPostPageState extends State<AddPostPage> {
     _animalNameController.dispose();
     _locationController.dispose();
     _descriptionController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
+  Future<bool> isValidImageUrl(String url) async {
+    try {
+      final response = await http.head(Uri.parse(url));
+      final contentType = response.headers['content-type'];
 
-  Future<void> _pickImage(ImageSource source) async {
-    final pickedFile = await _picker.pickImage(source: source);
-
-    if (pickedFile != null) {
-      setState(() {
-        _image = pickedFile;
-      });
+      return response.statusCode == 200 &&
+          contentType != null &&
+          contentType.startsWith('image/');
+    } catch (_) {
+      return false;
     }
   }
 
   Widget _buildImagePreview() {
-    if (_image == null) {
+    if (_imageUrl == null || _imageUrl!.isEmpty) {
       return Center(
         child: Icon(
           Icons.image_outlined,
@@ -53,31 +54,33 @@ class _AddPostPageState extends State<AddPostPage> {
       );
     }
 
-    const imageFit = BoxFit.contain;
-
-    if (kIsWeb) {
-      return Image.network(_image!.path, fit: imageFit);
-    } else {
-      return Image.file(File(_image!.path), fit: imageFit);
-    }
+    return Image.network(
+      _imageUrl!,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) {
+        return const Center(child: Text("Image non valide"));
+      },
+    );
   }
 
   void _navigateToHome() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => const HomePage(),
+        builder: (context) => const MainScreen(),
       ),
     );
   }
 
   Future<void> _submitPost() async {
+    final imageUrl = _imageUrl?.trim();
+
     if (_animalNameController.text.isEmpty ||
         _locationController.text.isEmpty ||
-        _image == null) {
+        imageUrl == null || imageUrl.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Veuillez remplir tous les champs et sélectionner une image.',
+            'Veuillez remplir tous les champs et fournir une URL d\'image valide.',
           ),
           backgroundColor: Colors.red,
         ),
@@ -89,49 +92,59 @@ class _AddPostPageState extends State<AddPostPage> {
       _isLoading = true;
     });
 
+    // ✅ Valider que l'image est accessible
+    final isImageValid = await isValidImageUrl(imageUrl);
+
+    if (!isImageValid) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('L\'image fournie n\'est pas valide ou inaccessible.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return;
+    }
+
     try {
-      // Créer le post via le service
+      // Publier le post avec le service
       await _postService.createPost(
         animalName: _animalNameController.text.trim(),
         location: _locationController.text.trim(),
         description: _descriptionController.text.trim(),
-        image: _image!,
+        imageUrl: imageUrl,
         userId: FirebaseAuth.instance.currentUser?.uid,
       );
 
       if (!mounted) return;
 
-      // Succès : afficher un message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Post publié avec succès !'),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
         ),
       );
 
-      // Réinitialiser le formulaire
       _animalNameController.clear();
       _locationController.clear();
       _descriptionController.clear();
+      _imageUrlController.clear();
+
       setState(() {
-        _image = null;
+        _imageUrl = null;
       });
 
-      // Attendre un peu puis naviguer vers la home
       await Future.delayed(const Duration(seconds: 1));
       if (!mounted) return;
       _navigateToHome();
-
     } catch (e) {
       if (!mounted) return;
-
-      // Erreur : afficher un message d'erreur
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Erreur lors de la publication: $e'),
           backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
         ),
       );
     } finally {
@@ -168,25 +181,22 @@ class _AddPostPageState extends State<AddPostPage> {
                 const SizedBox(height: 24),
 
                 // Boutons pour caméra et galerie
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    FloatingActionButton(
-                      onPressed: _isLoading ? null : () => _pickImage(ImageSource.camera),
-                      backgroundColor: _isLoading ? Colors.grey : Colors.green,
-                      heroTag: 'camera_button',
-                      child: const Icon(Icons.camera_alt, color: Colors.white),
+
+                TextField(
+                      controller: _imageUrlController,
+                      enabled: !_isLoading,
+                      decoration: const InputDecoration(
+                        labelText: "Lien de l'image",
+                        border: OutlineInputBorder(),
+                        hintText: "https://example.com/image.jpg",
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          _imageUrl = value.trim();
+                        });
+                      },
                     ),
-                    const SizedBox(width: 32),
-                    FloatingActionButton(
-                      onPressed: _isLoading ? null : () => _pickImage(ImageSource.gallery),
-                      backgroundColor: _isLoading ? Colors.grey : Colors.green,
-                      heroTag: 'gallery_button',
-                      child: const Icon(Icons.photo_library, color: Colors.white),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
 
                 // Formulaire
                 TextField(
