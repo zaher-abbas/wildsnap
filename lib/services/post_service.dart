@@ -8,28 +8,35 @@ class PostService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  /// Upload l'image vers Firebase Storage
   Future<String> uploadImage(XFile image, String postId) async {
     try {
-      // Référence vers le fichier dans Storage
-      final storageRef = _storage.ref().child('posts/$postId/${image.name}');
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = '$timestamp.jpg';
+      final storageRef = _storage.ref().child('posts/$postId/$fileName');
+      UploadTask uploadTask;
 
-      // Upload différent selon la plateforme
       if (kIsWeb) {
-        // Sur Web : upload depuis les bytes
         final bytes = await image.readAsBytes();
-        await storageRef.putData(
+        uploadTask = storageRef.putData(
           bytes,
-          SettableMetadata(contentType: 'image/jpeg'),
+          SettableMetadata(
+            contentType: 'image/jpeg',
+            customMetadata: {'uploaded-by': 'wildsnap-web'},
+          ),
         );
       } else {
-        // Sur Mobile : upload depuis le fichier
         final file = File(image.path);
-        await storageRef.putFile(file);
+        uploadTask = storageRef.putFile(
+          file,
+          SettableMetadata(
+            contentType: 'image/jpeg',
+            customMetadata: {'uploaded-by': 'wildsnap-mobile'},
+          ),
+        );
       }
 
-      // Récupérer l'URL de téléchargement
-      final downloadUrl = await storageRef.getDownloadURL();
+      final snapshot = await uploadTask;
+      final downloadUrl = await snapshot.ref.getDownloadURL();
       return downloadUrl;
     } catch (e) {
       print('Erreur lors de l\'upload de l\'image: $e');
@@ -37,31 +44,27 @@ class PostService {
     }
   }
 
-  /// Créer un nouveau post dans Firestore
   Future<void> createPost({
     required String animalName,
     required String location,
-    required String description,
+    String? description,
     required XFile image,
-    String? userId, // Optionnel si vous utilisez Firebase Auth
+    String? userId,
   }) async {
     try {
-      // Créer un nouveau document avec un ID auto-généré
       final docRef = _firestore.collection('posts').doc();
       final postId = docRef.id;
 
-      // 1. Upload de l'image
       final imageUrl = await uploadImage(image, postId);
 
       // 2. Créer le document dans Firestore
       await docRef.set({
         'animalName': animalName,
         'location': location,
-        'description': description,
+        'description': description ?? '',
         'imageUrl': imageUrl,
         'userId': userId ?? 'anonymous',
         'createdAt': FieldValue.serverTimestamp(),
-        'likes': 0,
       });
 
       print('Post créé avec succès: $postId');
@@ -77,22 +80,5 @@ class PostService {
         .collection('posts')
         .orderBy('createdAt', descending: true)
         .snapshots();
-  }
-
-  /// Supprimer un post
-  Future<void> deletePost(String postId, String imageUrl) async {
-    try {
-      // Supprimer l'image du Storage
-      final ref = _storage.refFromURL(imageUrl);
-      await ref.delete();
-
-      // Supprimer le document Firestore
-      await _firestore.collection('posts').doc(postId).delete();
-
-      print('Post supprimé avec succès');
-    } catch (e) {
-      print('Erreur lors de la suppression: $e');
-      rethrow;
-    }
   }
 }
