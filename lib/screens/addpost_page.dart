@@ -1,8 +1,8 @@
-import 'dart:io'; // Import pour utiliser la classe File
-import 'package:flutter/foundation.dart'
-    show kIsWeb; // Pour la compatibilité web
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // Import du package
+import 'package:http/http.dart' as http;
+import 'package:wildsnap/screens/main_screen.dart';
+import 'package:wildsnap/services/post_service.dart';
 import 'package:wildsnap/widgets/custom_appbar.dart';
 
 class AddPostPage extends StatefulWidget {
@@ -13,33 +13,38 @@ class AddPostPage extends StatefulWidget {
 }
 
 class _AddPostPageState extends State<AddPostPage> {
-  XFile? _image;
+  String? _imageUrl;
+  bool _isLoading = false;
 
   final _animalNameController = TextEditingController();
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _picker = ImagePicker();
+  final _imageUrlController = TextEditingController();
+  final _postService = PostService();
 
   @override
   void dispose() {
     _animalNameController.dispose();
     _locationController.dispose();
     _descriptionController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
+  Future<bool> isValidImageUrl(String url) async {
+    try {
+      final response = await http.head(Uri.parse(url));
+      final contentType = response.headers['content-type'];
 
-  Future<void> _pickImage(ImageSource source) async {
-    final pickedFile = await _picker.pickImage(source: source);
-
-    if (pickedFile != null) {
-      setState(() {
-        _image = pickedFile;
-      });
+      return response.statusCode == 200 &&
+          contentType != null &&
+          contentType.startsWith('image/');
+    } catch (_) {
+      return false;
     }
   }
 
   Widget _buildImagePreview() {
-    if (_image == null) {
+    if (_imageUrl == null || _imageUrl!.isEmpty) {
       return Center(
         child: Icon(
           Icons.image_outlined,
@@ -49,122 +54,213 @@ class _AddPostPageState extends State<AddPostPage> {
       );
     }
 
-    const imageFit = BoxFit.contain;
-
-    if (kIsWeb) {
-      // Sur le web, on utilise Image.network
-      return Image.network(_image!.path, fit: imageFit);
-    } else {
-      // Sur mobile, on utilise Image.file
-      return Image.file(File(_image!.path), fit: imageFit);
-    }
+    return Image.network(
+      _imageUrl!,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) {
+        return const Center(child: Text("Image non valide"));
+      },
+    );
   }
 
-  void _submitPost() {
+  void _navigateToHome() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => const MainScreen(),
+      ),
+    );
+  }
+
+  Future<void> _submitPost() async {
+    final imageUrl = _imageUrl?.trim();
+
     if (_animalNameController.text.isEmpty ||
         _locationController.text.isEmpty ||
-        _image == null) {
-      print("Erreur : Tous les champs et l'image sont requis.");
+        imageUrl == null || imageUrl.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Veuillez remplir tous les champs et sélectionner une image.',
+            'Veuillez remplir tous les champs et fournir une URL d\'image valide.',
           ),
+          backgroundColor: Colors.red,
         ),
       );
       return;
     }
 
-    print('Nom: ${_animalNameController.text}');
-    print('Localisation: ${_locationController.text}');
-    print('Description: ${_descriptionController.text}');
-    print('Chemin de l\'image: ${_image?.path}');
-    print('Publication en cours...');
+    setState(() {
+      _isLoading = true;
+    });
+
+    // ✅ Valider que l'image est accessible
+    final isImageValid = await isValidImageUrl(imageUrl);
+
+    if (!isImageValid) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('L\'image fournie n\'est pas valide ou inaccessible.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return;
+    }
+
+    try {
+      // Publier le post avec le service
+      await _postService.createPost(
+        animalName: _animalNameController.text.trim(),
+        location: _locationController.text.trim(),
+        description: _descriptionController.text.trim(),
+        imageUrl: imageUrl,
+        userId: FirebaseAuth.instance.currentUser?.uid,
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Post publié avec succès !'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      _animalNameController.clear();
+      _locationController.clear();
+      _descriptionController.clear();
+      _imageUrlController.clear();
+
+      setState(() {
+        _imageUrl = null;
+      });
+
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
+      _navigateToHome();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de la publication: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(title: 'Nouvelle Publication'),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              height: 250,
-              width: double.infinity,
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                border: Border.all(color: Colors.grey.shade400),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: _buildImagePreview(),
-            ),
-            const SizedBox(height: 24),
-
-            // --- Boutons pour caméra et galerie ---
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+      appBar: CustomAppbar(),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Bouton Caméra
-                FloatingActionButton(
-                  onPressed: () => _pickImage(ImageSource.camera),
-                  backgroundColor: Colors.green,
-                  heroTag: 'camera_button',
-                  child: const Icon(Icons.camera_alt, color: Colors.white),
+                Container(
+                  height: 250,
+                  width: double.infinity,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    border: Border.all(color: Colors.grey.shade400),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: _buildImagePreview(),
                 ),
-                const SizedBox(width: 32),
-                // Bouton Galerie
-                FloatingActionButton(
-                  onPressed: () => _pickImage(ImageSource.gallery),
-                  backgroundColor: Colors.green,
-                  heroTag: 'gallery_button',
-                  child: const Icon(Icons.photo_library, color: Colors.white),
+                const SizedBox(height: 24),
+
+                // Boutons pour caméra et galerie
+
+                TextField(
+                      controller: _imageUrlController,
+                      enabled: !_isLoading,
+                      decoration: const InputDecoration(
+                        labelText: "Lien de l'image",
+                        border: OutlineInputBorder(),
+                        hintText: "https://example.com/image.jpg",
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          _imageUrl = value.trim();
+                        });
+                      },
+                    ),
+                const SizedBox(height: 16),
+
+                // Formulaire
+                TextField(
+                  controller: _animalNameController,
+                  enabled: !_isLoading,
+                  decoration: const InputDecoration(
+                    labelText: "Nom de l'animal",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _locationController,
+                  enabled: !_isLoading,
+                  decoration: const InputDecoration(
+                    labelText: 'Localisation',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _descriptionController,
+                  enabled: !_isLoading,
+                  decoration: const InputDecoration(
+                    labelText: 'Description (optionnel)',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 32),
+
+                // Bouton Post
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _submitPost,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    textStyle: const TextStyle(fontSize: 18),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                      : const Text('Poster'),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+          ),
 
-            // --- Formulaire ---
-            TextField(
-              controller: _animalNameController,
-              decoration: const InputDecoration(
-                labelText: "Nom de l'animal",
-                border: OutlineInputBorder(),
+          // Overlay de chargement (par-dessus tout)
+          if (_isLoading)
+            Container(
+              color: Colors.black38,
+              child: const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
               ),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _locationController,
-              decoration: const InputDecoration(
-                labelText: 'Localisation',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Description (optionnel)',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 32),
-
-            // --- Bouton Post ---
-            ElevatedButton(
-              onPressed: _submitPost,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                textStyle: const TextStyle(fontSize: 18),
-              ),
-              child: const Text('Poster'),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
