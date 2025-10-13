@@ -59,42 +59,66 @@ class _RandomCatfactState extends State<RandomCatfact> {
             ? Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Card(
-              shape: RoundedRectangleBorder(
+            Container(
+              decoration: Theme
+                  .of(context)
+                  .brightness == Brightness.dark
+                  ? BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    // plus visible que 0.1
+                    spreadRadius: 1,
+                    blurRadius: 10,
+                  ),
+                ],
                 borderRadius: BorderRadius.circular(5),
-              ),
-              elevation: 4,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.black26
-                  : Colors.amber[200],
-              child: Container(
-                width: 600,
-                height: 170,
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Text(
-                          _fact!,
-                          style: DefaultTextStyle.of(context).style.copyWith(
-                            fontSize: 16,
-                            fontStyle: FontStyle.italic,
-                            color: Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white
-                                : Colors.black87,
+              )
+                  : null,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                elevation: 4,
+                color: Theme
+                    .of(context)
+                    .brightness == Brightness.dark
+                    ? Colors.black
+                    : Colors.amber[200],
+                child: Container(
+                  width: 600,
+                  height: 170,
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Text(
+                            _fact!,
+                            style: DefaultTextStyle
+                                .of(context)
+                                .style
+                                .copyWith(
+                              fontSize: 16,
+                              fontStyle: FontStyle.italic,
+                              color: Theme
+                                  .of(context)
+                                  .brightness == Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black87,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
                         ),
                       ),
-                    ),
-                    SizedBox(height: 8),
-                    ElevatedButton.icon(
-                      onPressed: _loadRandomFact,
-                      icon: Icon(Icons.refresh),
-                      label: Text('Another fact'),
-                    ),
-                  ],
+                      SizedBox(height: 8),
+                      ElevatedButton.icon(
+                        onPressed: _loadRandomFact,
+                        icon: Icon(Icons.refresh),
+                        label: Text('Another fact'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

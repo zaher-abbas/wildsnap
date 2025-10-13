@@ -76,8 +76,6 @@ class AppTheme {
   );
 }
 
-
-
 class ThemeProvider extends ChangeNotifier {
   bool _isDark = false;
   bool get isDark => _isDark;

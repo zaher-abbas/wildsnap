@@ -11,6 +11,7 @@ class NewPostHome extends StatefulWidget {
 
 class _NewPostHomeState extends State<NewPostHome> {
   final PostService _postService = PostService();
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -20,26 +21,28 @@ class _NewPostHomeState extends State<NewPostHome> {
           final posts = snapshot.data!.docs;
           return Column(
             children: posts.map((post) {
+              final isDark = Theme
+                  .of(context)
+                  .brightness == Brightness.dark;
+
               return Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    if (Theme.of(context).brightness == Brightness.dark)
-                      BoxShadow(
-                        color: Colors.white.withOpacity(0.1),
-                        blurRadius: 10,
-                        spreadRadius: 1,
-                        offset: Offset(0, 4),
-                      ),
-                  ],
-                ),
                 margin: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
+                    horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(
+                  boxShadow: isDark
+                      ? [
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                      offset: Offset(0, 0),
+                    ),
+                  ]
+                      : [],
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Card(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.black
-                      : Colors.amber[200],
+                  color: isDark ? Colors.black87 : Colors.amber[200],
                   clipBehavior: Clip.antiAliasWithSaveLayer,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
@@ -57,45 +60,61 @@ class _NewPostHomeState extends State<NewPostHome> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
-                          mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            RichText(
-                              text: TextSpan(
-                                style: DefaultTextStyle.of(context).style,
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: 'Animal: ',
-                                      style: TextStyle(fontWeight: FontWeight.bold)),
-                                  TextSpan(text: post['animalName']),
-                                ],
-                              ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    'Animal:',
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Text(post['animalName']),
+                                ),
+                              ],
                             ),
-                            RichText(
-                              text: TextSpan(
-                                style: DefaultTextStyle.of(context).style,
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: 'Localisations: ',
-                                      style: TextStyle(fontWeight: FontWeight.bold)),
-                                  TextSpan(text: post['location']),
-                                ],
-                              ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    'Localisation:',
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Text(post['location']),
+                                ),
+                              ],
                             ),
-                            RichText(
-                              text: TextSpan(
-                                style: DefaultTextStyle.of(context).style,
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: 'Description: ',
-                                      style: TextStyle(fontWeight: FontWeight.bold)),
-                                  TextSpan(text: post['description']),
-                                ],
-                              ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    'Description:',
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Text(post['description'], style:
+                                  TextStyle(
+                                    fontSize: 16,
+                                    fontStyle: FontStyle.italic,
+                                  ),),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ),
+
                     ],
                   ),
                 ),
