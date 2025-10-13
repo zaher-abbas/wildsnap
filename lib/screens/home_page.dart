@@ -4,6 +4,7 @@ import 'package:wildsnap/widgets/random_catfact.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
