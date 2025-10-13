@@ -3,12 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:wildsnap/theme.dart';
 
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
 
   const CustomAppbar({
-    super.key,
-    required this.title,
-  });
+    super.key,});
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +35,6 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ],
             ),
-          ),
-          Text(
-              title,
-              style: TextStyle(color: Colors.white70)
           ),
           Align(
             alignment: Alignment.centerRight,

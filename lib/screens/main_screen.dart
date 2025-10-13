@@ -27,26 +27,32 @@ class _MainScreenState extends State<MainScreen> {
         index: _selectedIndex,
         children: _pages,
       ),
-        bottomNavigationBar: Container(
+      bottomNavigationBar: SafeArea(
+        child: Container(
           color: Colors.green[700],
-            child: GNav(
-              gap: 4,
-              activeColor: Colors.white,
-              color: Colors.black,
-              tabBackgroundColor: Theme.of(context).colorScheme.secondary,
-              padding: const EdgeInsets.all(16),
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              selectedIndex: _selectedIndex,
-              onTabChange: (index) {
-                setState(() => _selectedIndex = index);
-              },
-              tabs: const [
-                GButton(icon: Icons.home, text: 'Home'),
-                GButton(icon: Icons.post_add, text: 'Add Post'),
-                GButton(icon: Icons.collections, text: 'Collections'),
-              ],
-            ),
+          child: GNav(
+            gap: 4,
+            activeColor: Colors.white,
+            color: Colors.black,
+            tabBackgroundColor: Theme
+                .of(context)
+                .colorScheme
+                .secondary,
+            padding: const EdgeInsets.all(16),
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            selectedIndex: _selectedIndex,
+            onTabChange: (index) {
+              setState(() => _selectedIndex = index);
+            },
+            tabs: const [
+              GButton(icon: Icons.home, text: 'Home'),
+              GButton(icon: Icons.post_add, text: 'Add Post'),
+              GButton(icon: Icons.collections, text: 'Collections'),
+            ],
           ),
-        );
+        ),
+      ),
+    );
   }
 }
+

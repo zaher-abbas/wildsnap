@@ -15,20 +15,25 @@ class _RandomCatfactState extends State<RandomCatfact> {
   String? _error;
 
   Future<void> _loadRandomFact() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
       _error = null;
     });
     try {
       final catFact = await fetchCatFacts();
+
+      if (!mounted) return;
       setState(() {
         _fact = catFact.fact;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _error = e.toString();
       });
     } finally {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
@@ -73,7 +78,7 @@ class _RandomCatfactState extends State<RandomCatfact> {
                         child: Text(
                           _fact!,
                           style: DefaultTextStyle.of(context).style.copyWith(
-                            fontSize: 20,
+                            fontSize: 16,
                             fontStyle: FontStyle.italic,
                             color: Theme.of(context).brightness == Brightness.dark
                                 ? Colors.white
